@@ -9,6 +9,7 @@ export enum RegistrationActionTypes {
   CHECK_USERNAME_AVAILABILITY = "[Registration] Checking Username Available",
   USERNAME_IS_AVAILABLE = "[Registration] Username Is Available",
   USERNAME_IS_NOT_AVAILABLE = "[Registration] Username Is Not Available",
+  CLEAR_REGISTRATION_STATE = "[Registration] Clear State"
 }
 
 export class AttemptRegistrationAction implements Action {
@@ -47,9 +48,16 @@ export class UsernameIsNotAvailableAction implements Action {
   constructor() {}
 }
 
+export class ClearRegistrationState implements Action {
+  readonly type = RegistrationActionTypes.CLEAR_REGISTRATION_STATE;
+
+  constructor() {}
+}
+
 export type RegistrationActions = AttemptRegistrationAction |
   RegistrationSuccessAction |
   RegistrationFailureAction |
   CheckUsernameAvailabilityAction |
   UsernameAvailableAction |
-  UsernameIsNotAvailableAction;
+  UsernameIsNotAvailableAction |
+  ClearRegistrationState;

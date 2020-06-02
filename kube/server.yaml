@@ -1,0 +1,137 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: server-config
+  namespace: ers
+data:
+  security.json: |
+    {
+      "signerKeyPath": "/usr/local/keys/ers-signer",
+      "verifyKeyPath": "/usr/local/keys/ers-verifier",
+      "roleHierarchy": ["ROLE_ADMIN", "ROLE_MANAGER", "ROLE_EMPLOYEE", "ROLE_ANONYMOUS"]
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: server-env
+  namespace: ers
+data:
+  ELASTIC_APM_SERVER_URL: "http://apm-server.ers.svc.cluster.local:8200"
+  ELASTIC_APM_SERVICE_NAME: "ERS Server"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ers-server-secrets
+  namespace: ers
+  labels:
+    app: ers
+    tier: service
+data:
+  HOST: ers-mysql-svc
+  PORT: "3306"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ers-server-svc
+  namespace: ers
+  labels:
+    app: ers
+    tier: service
+spec:
+  ports:
+    - port: 8080
+      name: server-svc-port
+      targetPort: ers-server-port
+  selector:
+    app: ers
+    tier: service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ers-server-deploy
+  namespace: ers
+  labels:
+    app: ers
+    tier: service
+spec:
+  selector:
+    matchLabels:
+      app: ers
+      tier: service
+  template:
+    metadata:
+      name: ers-server-deploy
+      namespace: ers
+      labels:
+        app: ers
+        tier: service
+    spec:
+      containers:
+        - name: ers-server
+          image: ers-server
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+              name: ers-server-port
+              protocol: TCP
+          env:
+            - name: HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: HOST
+                  name: ers-server-secrets
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: PORT
+                  name: ers-server-secrets
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  key: MYSQL_USER
+                  name: mysql-secrets
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: MYSQL_PASSWORD
+                  name: mysql-secrets
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  key: MYSQL_DATABASE
+                  name: mysql-secrets
+            - name: SECURITY_CONFIG_JSON
+              value: /etc/ers/security.json
+          envFrom:
+            - configMapRef:
+                name: server-env
+          readinessProbe:
+            httpGet:
+              port: 8080
+              path: /healthz
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            successThreshold: 1
+            failureThreshold: 5
+          volumeMounts:
+            - mountPath: /etc/ers/security.json
+              name: server-config
+              subPath: security.json
+            - mountPath: /usr/local/keys
+              readOnly: true
+              name: server-keys
+      volumes:
+        - name: server-config
+          configMap:
+            name: server-config
+            items:
+              - key: security.json
+                path: security.json
+        - name: server-keys
+          secret:
+            secretName: ers-keys
+

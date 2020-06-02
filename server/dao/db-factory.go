@@ -72,9 +72,9 @@ func initAdminIfNotPresent(db *gorm.DB) {
       logger.Get().Errorf("Failed to save admin details: %+v", err)
       panic(err)
     }
-    
+
     adminRole := model.Role{
-      Name:   "ROLE_ADMIN",
+      Name:   "ROLE_MANAGER",
       UserId: admin.ID,
       User:   admin,
     }

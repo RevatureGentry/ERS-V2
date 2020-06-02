@@ -1,7 +1,7 @@
-import {Reimbursement, ReimbursementStatus} from "../../domain/dto/reimbursement.dto";
+import {Reimbursement, ReimbursementStatus} from '../../domain/dto/reimbursement.dto';
 import * as fromRoot from '../../app.reducer';
-import {ReimbursementActions, ReimbursementActionTypes} from "./reimbursement.actions";
-import {createFeatureSelector, createSelector} from "@ngrx/store";
+import {ReimbursementActions, ReimbursementActionTypes} from './reimbursement.actions';
+import {createFeatureSelector, createSelector} from '@ngrx/store';
 
 export interface State extends fromRoot.State {
   reimbursementState: ReimbursementsState;
@@ -31,7 +31,7 @@ const initialState: ReimbursementsState = {
   createReimbursementErrorMessage: undefined
 };
 
-const getReimbursementState = createFeatureSelector<ReimbursementsState>("reimbursements");
+const getReimbursementState = createFeatureSelector<ReimbursementsState>('reimbursements');
 
 export const getPendingReimbursements = createSelector(
   getReimbursementState,
@@ -79,7 +79,7 @@ export function reducer(state = initialState, action: ReimbursementActions): Rei
       return { ...state, isLoading: true };
     case ReimbursementActionTypes.SUCCESSFUL_RETRIEVAL_OF_MY_REIMBURSEMENTS:
       const reimbursements: Reimbursement[] = Boolean(action.reimbursements) && Boolean(action.reimbursements.length) ? action.reimbursements : [];
-      return { ...state, reimbursements: reimbursements, isLoading: false, hasBeenLoaded: true };
+      return { ...state, reimbursements, isLoading: false, hasBeenLoaded: true };
     case ReimbursementActionTypes.CREATE_REIMBURSEMENT:
       return { ...state, isCreating: true };
     case ReimbursementActionTypes.CREATE_REIMBURSEMENT_SUCCESS:

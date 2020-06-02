@@ -30,13 +30,6 @@ export class ResolveReimbursementsComponent implements OnInit {
 
   ngOnInit() {
     this.isLoading = this.store.pipe(select(fromManager.isLoadingManagerModule));
-    // this.store.pipe(select(fromManager.isLoadingManagerModule)).subscribe(
-    //   isLoading => {
-    //     if (isLoading) {
-    //       this.store.dispatch(new managerActions.ManagerModuleLoadedAction());
-    //     }
-    //   }
-    // );
     this.pending$ = this.store.pipe(select(fromManager.getAllPendingReimbursements));
     this.resolved$ = this.store.pipe(select(fromManager.getAllResolvedReimbursements));
   }

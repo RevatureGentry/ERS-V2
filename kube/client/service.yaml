@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ers-client-svc
+  namespace: ers
+  labels:
+    app: ers
+    tier: frontend
+spec:
+  ports:
+    - port: 80
+      targetPort: ers-client-port
+      name: client-svc-port
+  selector:
+    app: ers
+    tier: frontend

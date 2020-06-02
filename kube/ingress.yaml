@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: ers-ingress
+  namespace: ers
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/allow-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Keep-Alive, User-Agent, X-Requested-With, If-Modified-Since, Cache-Control, Content-Type, Authorization, Access-Control-Allow-Origin, Access-Control-Allow-Methods, Access-Control-Allow-Credentials, Access-Control-Allow-Headers, Set-Cookie"
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /app(.*)
+            backend:
+              serviceName: ers-client-svc
+              servicePort: client-svc-port
+          - path: /app/api/(.*)
+            backend:
+              serviceName: ers-server-svc
+              servicePort: server-svc-port

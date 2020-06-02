@@ -1,7 +1,7 @@
-import * as fromRoot from "../../app.reducer";
-import {Message} from "../../domain/dto/message.dto";
-import {RegistrationActions, RegistrationActionTypes} from "./registration.actions";
-import {createFeatureSelector, createSelector} from "@ngrx/store";
+import * as fromRoot from '../../app.reducer';
+import {Message} from '../../domain/dto/message.dto';
+import {RegistrationActions, RegistrationActionTypes} from './registration.actions';
+import {createFeatureSelector, createSelector} from '@ngrx/store';
 
 export interface State extends fromRoot.State {
   registration: RegistrationState;
@@ -67,6 +67,8 @@ export function reducer(state = initialState, action: RegistrationActions): Regi
       return { ...state, operationSuccessful: true, message: action.message };
     case RegistrationActionTypes.REGISTRATION_FAILURE:
       return { ...state, operationSuccessful: false, message: action.message };
+    case RegistrationActionTypes.CLEAR_REGISTRATION_STATE:
+      return initialState;
     default:
       return state;
   }

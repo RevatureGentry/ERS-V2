@@ -26,7 +26,7 @@ func (dao *reimbursementDao) FindAll(ctx context.Context) []dto.ReimbursementDto
   username, usernameOk := info.Get("username")
   if usernameOk {
     var reimbursements []dto.ReimbursementDto
-    if err := withContext(ctx).Table("reimbursements").Joins("INNER JOIN users on users.id = reimbursements.user_id AND users.username = ?", username).Find(&reimbursements).Error; err != nil {
+    if err := withContext(ctx).Table("reimbursements").Joins("INNER JOIN users on users.id = reimbursements.user_id AND users.username <> ?", username).Find(&reimbursements).Error; err != nil {
       logger.WithContext(ctx).Infof("Failed to read all reimbursements: %+v", err)
       return make([]dto.ReimbursementDto, 0)
     }
@@ -67,12 +67,12 @@ func (dao *reimbursementDao) Create(ctx context.Context, form dto.ReimbursementF
     UserId:      user.ID,
     User:        user,
   }
-  
+
   if err := withContext(ctx).Save(&reimbursement).Error; err != nil {
     logger.WithContext(ctx).Infof("Failed to create reimbursement: %+v", reimbursement)
     panic(err)
   }
-  
+
   return dto.ReimbursementDto{
     Id:             reimbursement.ID,
     Amount:         reimbursement.Amount,
@@ -111,13 +111,14 @@ func (dao *reimbursementDao) Resolve(ctx context.Context, dto dto.ReimbursementD
     logger.WithContext(ctx).Infof("Failed to locate reimbursement with id [%d] to update", dto.Id)
     panic(err)
   }
-  username, ok := ctx.Value("username").(string)
+  info, ok := ctx.Value("info").(middleware.TokenContext)
+  username, _ = info.Get("username")
   if err := withContext(ctx).Model(&reimbursement).Updates(model.Reimbursement{
     Amount:      dto.Amount,
     Description: dto.Description,
     ExpenseDate: dto.ExpenseDate,
-    ResolvedBy:  dto.ResolvedBy,
-    ResolutionDate: time.Now().Unix(),
+    ResolvedBy:  username,
+    ResolutionDate: time.Now().UTC().UnixNano() / 1e6,
     Status:      dto.Status,
   }).Error; err != nil && ok {
     logger.WithContext(ctx).Infof("Failed to update %s's reimbursement: %+v", username, reimbursement)

@@ -6,6 +6,7 @@ import {Observable} from 'rxjs';
 import {childRouteAnimations, dramaticEntrance} from '../../../app.animations';
 import {CookieService} from 'ngx-cookie-service';
 import {Router, RouterOutlet} from '@angular/router';
+import {ClearUserDetailsAction} from '../../../user/state/user.actions';
 
 @Component({
   selector: 'app-home-container',
@@ -30,6 +31,7 @@ export class HomeContainerComponent implements OnInit {
   handleLogout() {
     this.router.navigateByUrl('/login');
     this.cookieService.delete('api_token');
+    this.store.dispatch(new ClearUserDetailsAction());
   }
 
   prepareChildRouteAnimation(outlet: RouterOutlet) {

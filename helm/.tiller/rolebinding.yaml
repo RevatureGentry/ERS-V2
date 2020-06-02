@@ -9,5 +9,5 @@ subjects:
   namespace: ers
 roleRef:
   kind: Role
-  name: tiller-role 
+  name: tiller-role
   apiGroup: rbac.authorization.k8s.io

@@ -39,7 +39,7 @@ export class ToolbarComponent implements OnInit {
     this.store.pipe(select(fromManager.hasModuleBeenLoaded)).subscribe(
       isLoaded => {
         if (isLoaded) {
-          this.router.navigateByUrl('/home/manage');
+          this.router.navigateByUrl('/home/manage').then(() => this.store.dispatch(new managerActions.FindAllReimbursementsAction()));
         } else {
           this.isLoadingManagerModule = true;
           // tslint:disable-next-line:max-line-length
@@ -47,6 +47,7 @@ export class ToolbarComponent implements OnInit {
             this.store.dispatch(new managerActions.LoadManagerModuleAction(this.currentUser.username));
             this.store.pipe(select(fromManager.isLoadingManagerModule)).subscribe(
               isDoneLoading => {
+                console.log(isDoneLoading)
                 if (isDoneLoading) {
                   this.store.dispatch(new managerActions.ManagerModuleLoadedAction());
                   this.router.navigateByUrl('/home/manage');

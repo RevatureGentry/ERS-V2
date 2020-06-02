@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ers-client-deploy
+  namespace: ers
+  labels:
+    app: ers
+    tier: frontend
+spec:
+  selector:
+    matchLabels:
+      app: ers
+      tier: frontend
+  template:
+    metadata:
+      name: ers-client-deploy
+      namespace: ers
+      labels:
+        app: ers
+        tier: frontend
+    spec:
+      containers:
+        - name: ers-client
+          image: ers-client
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+              name: ers-client-port
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /etc/nginx/conf.d/default.conf
+              name: nginx-config
+              subPath: default.conf
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: client-config
+            items:
+              - key: default.conf
+                path: default.conf
